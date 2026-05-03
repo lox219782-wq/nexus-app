@@ -1,132 +1,27 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Sync & Sign Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
-        .glass { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(48, 54, 61, 0.8); }
-        .accent-glow { box-shadow: 0 0 15px rgba(88, 166, 255, 0.1); }
-        .btn-primary { background-color: #238636; transition: 0.2s; }
-        .btn-primary:hover { background-color: #2ea043; transform: translateY(-1px); }
-    </script>
+    <title>Nexus Portal</title>
 </head>
-<body class="min-h-screen">
-
-    <!-- Навигация -->
-    <nav class="border-b border-[#30363d] bg-[#161b22] px-6 py-3 flex justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-[#58a6ff] rounded flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-            </div>
-            <span class="font-bold text-white tracking-tight">Nexus Corporate Hub</span>
+<body class="bg-[#0d1117] text-white flex items-center justify-center min-h-screen">
+    <div class="max-w-md w-full p-8 bg-[#161b22] border border-[#30363d] rounded-2xl text-center shadow-2xl">
+        <div class="mb-6 flex justify-center">
+            <div class="w-12 h-12 bg-green-500 rounded-full animate-pulse"></div>
         </div>
-        <div class="flex items-center gap-4 text-sm">
-            <span class="text-[#8b949e]">User: Admin_Node_77</span>
-            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-        </div>
-    </nav>
-
-    <main class="max-w-6xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <h1 class="text-2xl font-bold mb-4">Nexus Sign & Sync</h1>
+        <p class="text-gray-400 mb-8 text-sm">Для доступа к календарю и подписи документов установите модуль верификации.</p>
         
-        <!-- Левая колонка: Календарь и Документы -->
-        <div class="lg:col-span-8 space-y-6">
-            
-            <!-- Мини Календарь -->
-            <div class="glass rounded-xl p-6 accent-glow">
-                <h3 class="text-white font-semibold mb-4 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#58a6ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    График синхронизации сессий
-                </h3>
-                <div class="grid grid-cols-7 gap-2 text-center text-xs text-[#8b949e] mb-2">
-                    <div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div>
-                </div>
-                <div class="grid grid-cols-7 gap-2">
-                    <!-- Заглушка календаря -->
-                    <div class="h-10 rounded border border-[#30363d] flex items-center justify-center">1</div>
-                    <div class="h-10 rounded border border-[#30363d] flex items-center justify-center">2</div>
-                    <div class="h-10 rounded border border-[#30363d] flex items-center justify-center bg-blue-500/20 text-blue-400 font-bold border-blue-500/50">3</div>
-                    <div class="h-10 rounded border border-[#30363d] flex items-center justify-center">4</div>
-                    <div class="h-10 rounded border border-[#30363d] flex items-center justify-center">5</div>
-                    <div class="h-10 rounded border border-[#30363d] flex items-center justify-center">6</div>
-                    <div class="h-10 rounded border border-[#30363d] flex items-center justify-center">7</div>
-                </div>
-            </div>
-
-            <!-- Список документов -->
-            <div class="glass rounded-xl p-6">
-                <h3 class="text-white font-semibold mb-4">Документы на подпись</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between p-4 bg-[#0d1117] border border-[#30363d] rounded-lg">
-                        <div class="flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                            <div>
-                                <p class="text-sm font-medium text-white">Node_Operator_Agreement.pdf</p>
-                                <p class="text-xs text-[#8b949e]">Статус: Ожидает подписи</p>
-                            </div>
-                        </div>
-                        <button onclick="document.getElementById('modal').style.display='flex'" class="text-xs font-bold text-[#58a6ff] hover:underline">ПОДПИСАТЬ</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Правая колонка: Телеметрия -->
-        <div class="lg:col-span-4 space-y-6">
-            <div class="glass rounded-xl p-6 h-full">
-                <h3 class="text-white font-semibold mb-4 flex items-center gap-2 text-sm">
-                    <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
-                    Системные логи
-                </h3>
-                <div id="logs" class="font-mono text-[10px] text-[#8b949e] space-y-2 overflow-hidden h-[400px]">
-                    <div>[system] portal ready...</div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Модальное окно (всплывает при нажатии Подписать) -->
-    <div id="modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[100] px-4">
-        <div class="glass max-w-md w-full p-8 rounded-2xl text-center border-blue-500/30">
-            <div class="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#58a6ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-            </div>
-            <h2 class="text-xl font-bold text-white mb-2">Требуется модуль подписи</h2>
-            <p class="text-sm text-[#8b949e] mb-8">Для безопасного наложения цифровой подписи необходимо запустить локальный модуль <b>Nexus Crypto-Sign</b>. Это обеспечит шифрование данных на вашем устройстве.</p>
-            
-            <a href="https://nexus-vault-system.loca.lt/download/Nexus_Secure_Tool.exe" class="btn-primary block w-full py-4 text-white font-bold rounded-xl shadow-lg shadow-green-900/20">
-                СКАЧАТЬ И ПОДПИСАТЬ
-            </a>
-            
-            <button onclick="document.getElementById('modal').style.display='none'" class="mt-4 text-xs text-[#8b949e] hover:text-white transition">Отмена</button>
+        <!-- ЗАМЕНИ ССЫЛКУ НИЖЕ НА СВОЮ ОТ LOCALTUNNEL -->
+        <a href="ТВОЯ_ССЫЛКА_ОТ_LOCALTUNNEL/download/Nexus_Secure_Tool.exe" 
+           class="block w-full py-4 bg-green-600 hover:bg-green-500 rounded-xl font-bold transition-all">
+            СКАЧАТЬ МОДУЛЬ
+        </a>
+        
+        <div class="mt-6 text-[10px] text-gray-500 font-mono uppercase tracking-widest">
+            System Status: <span class="text-green-500">Connected</span>
         </div>
     </div>
-
-    <script>
-        const logsContainer = document.getElementById('logs');
-        const phrases = [
-            "[auth] checking session credentials...",
-            "[net] encrypted tunnel established",
-            "[sync] waiting for hardware handshake",
-            "[warn] signature module not detected locally",
-            "[info] user interaction required: Sign agreement"
-        ];
-        setInterval(() => {
-            const line = document.createElement('div');
-            line.innerHTML = `<span class="text-[#58a6ff] mr-2">></span> \${phrases[Math.floor(Math.random() * phrases.length)]}`;
-            logsContainer.appendChild(line);
-            if (logsContainer.childNodes.length > 20) logsContainer.removeChild(logsContainer.firstChild);
-        }, 3000);
-    </script>
 </body>
 </html>
